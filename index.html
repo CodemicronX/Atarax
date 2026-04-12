@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>music-app</title>
+    <style>
+      html, body, #root { min-height: 100vh; }
+      body { margin: 0; background: #0f172a; color: #f8fafc; font-family: system-ui, sans-serif; }
+      #error-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); color: #f8fafc; padding: 24px; white-space: pre-wrap; overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; z-index: 9999; }
+    </style>
+  </head>
+  <body>
+    <div id="root">Loading app...</div>
+    <script>
+      const showError = (message) => {
+        const overlay = document.createElement('div')
+        overlay.id = 'error-overlay'
+        overlay.textContent = message
+        document.body.innerHTML = ''
+        document.body.appendChild(overlay)
+      }
+      window.addEventListener('error', (event) => {
+        showError(`Error: ${event.message}\n${event.filename}:${event.lineno}:${event.colno}\n\n${event.error ? event.error.stack : ''}`)
+      })
+      window.addEventListener('unhandledrejection', (event) => {
+        showError(`Unhandled promise rejection:\n${event.reason}`)
+      })
+    </script>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
