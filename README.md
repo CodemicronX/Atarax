@@ -1,16 +1,79 @@
-# React + Vite
+# Atarax
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern music dashboard built with React, Vite, Tailwind CSS, and Lucide icons.
 
-Currently, two official plugins are available:
+This project started as a sleek mobile-style music app UI with a glassy bottom navigation bar, responsive layout, and page switching for Home, Search, and Library.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **React 18** with functional components and hooks
+- **Vite** for fast development and lightning-fast builds
+- **Tailwind CSS** for expressive styling and smooth gradients
+- **Lucide icons** for crisp, modern navigation visuals
+- **Responsive layout** optimized for desktop and mobile screens
+- **Clean navigation** with active state highlighting
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🚀 Getting started
+
+```bash
+cd "c:\Users\Melis\.vscode\aidar projects\Lane copy\music-app"
+npm install
+npm run dev
+```
+
+Then open the local address shown in the terminal, typically:
+
+```text
+http://localhost:5173/
+```
+
+---
+
+## 🛠️ Build for production
+
+```bash
+npm run build
+```
+
+This generates a production-ready `dist/` folder.
+
+---
+
+## 📁 Project structure
+
+- `src/` — application source files
+- `src/App.jsx` — main UI and page state logic
+- `src/main.jsx` — React entrypoint
+- `src/index.css` — Tailwind and custom styling
+- `vite.config.js` — Vite + Tailwind config
+- `package.json` — dependencies and scripts
+
+---
+
+## ✅ Git workflow
+
+1. Create a feature branch for new UI or functionality
+   ```bash
+git checkout -b feature/my-change
+```
+2. Add files and commit regularly
+   ```bash
+git add .
+git commit -m "Add feature description"
+```
+3. Push to GitHub
+   ```bash
+git push -u origin feature/my-change
+```
+
+---
+
+## 👤 Author
+
+**CodemicronX**
+
+Built for the Atarax music UI project.
