@@ -1,4 +1,4 @@
-# Atarax
+﻿# Atarax
 
 A modern music dashboard built with React, Vite, Tailwind CSS, and Lucide icons.
 
@@ -19,56 +19,56 @@ This project started as a sleek mobile-style music app UI with a glassy bottom n
 
 ## 🚀 Getting started
 
-```bash
-cd "c:\Users\Melis\.vscode\aidar projects\Lane copy\music-app"
+`ash
+cd  c:\Users\Melis\.vscode\aidar projects\Lane copy\music-app
 npm install
 npm run dev
-```
+`
 
 Then open the local address shown in the terminal, typically:
 
-```text
+`	ext
 http://localhost:5173/
-```
+`
 
 ---
 
 ## 🛠️ Build for production
 
-```bash
+`ash
 npm run build
-```
+`
 
-This generates a production-ready `dist/` folder.
+This generates a production-ready dist/ folder.
 
 ---
 
 ## 📁 Project structure
 
-- `src/` — application source files
-- `src/App.jsx` — main UI and page state logic
-- `src/main.jsx` — React entrypoint
-- `src/index.css` — Tailwind and custom styling
-- `vite.config.js` — Vite + Tailwind config
-- `package.json` — dependencies and scripts
+- src/ — application source files
+- src/App.jsx — main UI and page state logic
+- src/main.jsx — React entrypoint
+- src/index.css — Tailwind and custom styling
+- ite.config.js — Vite + Tailwind config
+- package.json — dependencies and scripts
 
 ---
 
 ## ✅ Git workflow
 
 1. Create a feature branch for new UI or functionality
-   ```bash
+   `ash
 git checkout -b feature/my-change
-```
+`
 2. Add files and commit regularly
-   ```bash
+   `ash
 git add .
-git commit -m "Add feature description"
-```
+git commit -m Add feature description
+`
 3. Push to GitHub
-   ```bash
+   `ash
 git push -u origin feature/my-change
-```
+`
 
 ---
 

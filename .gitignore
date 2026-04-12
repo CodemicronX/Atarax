@@ -1,4 +1,4 @@
-# Logs
+﻿# Logs
 logs
 *.log
 npm-debug.log*
@@ -7,9 +7,15 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependency directories
+node_modules/
+jspm_packages/
+
+dist/
+dist-ssr/
+
+# Local config
+temp/
 *.local
 
 # Editor directories and files
@@ -22,3 +28,44 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage and cache
+coverage
+*.lcov
+.nyc_output
+.cache
+.parcel-cache
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional files
+.npm
+.eslintcache
+.stylelintcache
+.node_repl_history
+*.tgz
+.yarn-integrity
+.env
+.env.*
+!.env.example
+
+# Build output
+.next
+out
+.nuxt
+dist
+.cache/
+
+# Vite logs
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
