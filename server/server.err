@@ -1,0 +1,11 @@
+file:///C:/Users/Melis/.vscode/aidar%20projects/Lane%20copy/music-app/server/node_modules/youtubei.js/dist/src/core/Player.js:83
+            throw new PlayerError('No valid URL to decipher');
+                  ^
+
+PlayerError: No valid URL to decipher
+    at Player.decipher (file:///C:/Users/Melis/.vscode/aidar%20projects/Lane%20copy/music-app/server/node_modules/youtubei.js/dist/src/core/Player.js:83:19)
+    at Format.decipher (file:///C:/Users/Melis/.vscode/aidar%20projects/Lane%20copy/music-app/server/node_modules/youtubei.js/dist/src/parser/classes/misc/Format.js:181:23)
+    at file:///C:/Users/Melis/.vscode/aidar%20projects/Lane%20copy/music-app/server/index.js:70:19
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+Node.js v24.14.1
