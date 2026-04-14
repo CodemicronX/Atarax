@@ -1,8 +1,6 @@
 import { useState } from 'react'
-import { motion as Motion } from 'framer-motion'
 import { Disc3, Play, Search, Sparkles } from 'lucide-react'
 import { TrackItem } from './TrackItem'
-import { SpotifyImportPanel } from './SpotifyImportPanel'
 import { usePlayerStore } from '../store'
 
 const API_BASE = 'http://localhost:3001/api'
@@ -51,13 +49,13 @@ export function Home() {
   return (
     <section className="page-stack">
       <div className="hero-card hero-card--discover">
-        <div className="hero-layout">
+        <div className="hero-layout hero-layout--single">
           <div>
             <p className="eyebrow">Mood search</p>
-            <h1 className="hero-title">Premium dark player UI tuned to the energy of the current track.</h1>
+            <h1 className="hero-title">Search first, then move into dedicated playback and library views.</h1>
             <p className="hero-copy">
-              The interface stays minimal and soft, but reacts with dynamic plum gradients, glass layers and
-              micro-interactions that feel intentional instead of noisy.
+              The home screen stays intentionally focused on discovery so the app feels fast. Queue control, import and
+              detailed playback now belong to separate sections instead of competing on one page.
             </p>
 
             <form
@@ -78,7 +76,7 @@ export function Home() {
               </div>
 
               <button type="submit" className="primary-button" disabled={isLoading}>
-                {isLoading ? 'Searching…' : 'Search'}
+                {isLoading ? 'Searching...' : 'Search'}
               </button>
             </form>
 
@@ -98,65 +96,6 @@ export function Home() {
               ))}
             </div>
           </div>
-
-          <Motion.div className="hero-highlight" animate={{ y: [0, -6, 0] }} transition={{ duration: 6, repeat: Infinity }}>
-            <div>
-              <p className="hero-highlight__label">Session energy</p>
-              <p className="hero-highlight__value">{tracks.length}</p>
-              <p className="meta-copy">tracks currently loaded into the active queue</p>
-            </div>
-
-            {topTrack ? (
-              <button
-                type="button"
-                className="spotlight-track"
-                onClick={() => setCurrentTrack(topTrack, { autoplay: true })}
-              >
-                {topTrack.thumbnail ? (
-                  <img className="spotlight-track__art" src={topTrack.thumbnail} alt={topTrack.title} />
-                ) : (
-                  <div className="spotlight-track__art art-placeholder">
-                    <Disc3 size={20} />
-                  </div>
-                )}
-
-                <div className="spotlight-track__copy">
-                  <p className="spotlight-track__title">{topTrack.title}</p>
-                  <p className="spotlight-track__artist">{topTrack.artist}</p>
-                </div>
-
-                <span className="meta-pill">
-                  <Play size={14} />
-                  Play now
-                </span>
-              </button>
-            ) : (
-              <div className="lyrics-empty">
-                <Sparkles size={20} />
-                <p>Search or import a playlist to light up the player.</p>
-              </div>
-            )}
-          </Motion.div>
-        </div>
-      </div>
-
-      <div className="content-grid">
-        <SpotifyImportPanel />
-
-        <div className="info-card">
-          <div className="section-header">
-            <div>
-              <p className="eyebrow">Current focus</p>
-              <h2 className="section-title section-title--sm">
-                {currentTrack ? currentTrack.title : 'No track selected yet'}
-              </h2>
-            </div>
-          </div>
-          <p className="meta-copy">
-            {currentTrack
-              ? `${currentTrack.artist} is driving the palette, blur and lighting right now.`
-              : 'When you start playback, the interface adapts to the active song art and metadata.'}
-          </p>
         </div>
       </div>
 
@@ -196,6 +135,12 @@ export function Home() {
               <div className="meta-row">
                 <span className="meta-pill">{topTrack.isImported ? 'Imported mapping' : 'Direct search hit'}</span>
                 <span className="meta-pill">{tracks.length} results</span>
+                {currentTrack && (
+                  <span className="meta-pill">
+                    <Play size={14} />
+                    Live: {currentTrack.title}
+                  </span>
+                )}
               </div>
             </div>
           </button>
@@ -226,14 +171,14 @@ export function Home() {
 
           <div className="summary-tile">
             <Sparkles size={18} />
-            <strong>Mood UI</strong>
-            <p className="meta-copy">Colors and lighting adapt to the active cover art or a seeded fallback palette.</p>
+            <strong>Separated pages</strong>
+            <p className="meta-copy">Search stays here, while import, queue and detailed playback live elsewhere.</p>
           </div>
 
           <div className="summary-tile">
             <Play size={18} />
-            <strong>Smooth playback</strong>
-            <p className="meta-copy">Volume, shuffle, lyrics sync and premium motion stay lightweight and responsive.</p>
+            <strong>Lean playback</strong>
+            <p className="meta-copy">Lighter effects and simpler layout leave more headroom for actual music playback.</p>
           </div>
         </div>
       )}

@@ -103,6 +103,16 @@ button {
   isolation: isolate;
 }
 
+.media-engine {
+  position: fixed;
+  left: -9999px;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .app-background {
   position: fixed;
   inset: 0;
@@ -115,8 +125,8 @@ button {
   inset: -16%;
   background-position: center;
   background-size: cover;
-  opacity: 0.16;
-  filter: blur(110px) saturate(1.15);
+  opacity: 0.1;
+  filter: blur(72px) saturate(1.04);
   transform: scale(1.12) translateZ(0);
   will-change: transform, opacity;
 }
@@ -124,8 +134,8 @@ button {
 .ambient-orb {
   position: absolute;
   border-radius: 999px;
-  filter: blur(90px);
-  opacity: 0.8;
+  filter: blur(64px);
+  opacity: 0.52;
   transform: translateZ(0);
   will-change: transform, opacity;
 }
@@ -158,9 +168,13 @@ button {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr) 320px;
+  grid-template-columns: 280px minmax(0, 1fr);
   gap: 18px;
   min-height: calc(100vh - 40px);
+}
+
+.app-frame--with-rail {
+  grid-template-columns: 280px minmax(0, 1fr) 320px;
 }
 
 .glass-panel,
@@ -180,8 +194,8 @@ button {
     color-mix(in srgb, var(--theme-panel) 88%, rgba(0, 0, 0, 0.16));
   border: 1px solid var(--stroke);
   box-shadow: var(--shadow-soft);
-  backdrop-filter: blur(24px) saturate(1.08);
-  -webkit-backdrop-filter: blur(24px) saturate(1.08);
+  backdrop-filter: blur(14px) saturate(1.03);
+  -webkit-backdrop-filter: blur(14px) saturate(1.03);
 }
 
 .glass-panel {
@@ -445,6 +459,10 @@ button {
   align-items: stretch;
 }
 
+.hero-layout--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .hero-title {
   font-size: clamp(2.4rem, 5vw, 4.35rem);
   margin-bottom: 14px;
@@ -692,8 +710,8 @@ button {
   inset: 0;
   background-position: center;
   background-size: cover;
-  filter: blur(34px) saturate(1.1);
-  opacity: 0.23;
+  filter: blur(20px) saturate(1.02);
+  opacity: 0.14;
   transform: scale(1.2) translateZ(0);
 }
 
@@ -1190,7 +1208,7 @@ button {
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
     color-mix(in srgb, var(--theme-panel-strong) 88%, black 12%);
   border: 1px solid var(--stroke);
-  backdrop-filter: blur(22px);
+  backdrop-filter: blur(14px);
 }
 
 .mobile-nav__button {
@@ -1230,8 +1248,8 @@ button {
 .full-player-backdrop {
   background-position: center;
   background-size: cover;
-  filter: blur(96px) saturate(1.15);
-  opacity: 0.26;
+  filter: blur(56px) saturate(1.04);
+  opacity: 0.16;
 }
 
 .full-player-noise {

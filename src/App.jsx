@@ -45,7 +45,7 @@ function LoadingPanel() {
   return (
     <div className="lyrics-empty lyrics-empty--large">
       <Music4 size={22} />
-      <p>Loading premium view…</p>
+      <p>Loading premium view...</p>
     </div>
   )
 }
@@ -74,6 +74,7 @@ function App() {
     : currentTrack
       ? [currentTrack, ...tracks.filter((track) => track.id !== currentTrack.id)].slice(0, 4)
       : tracks.slice(0, 4)
+  const showRail = activePage !== 'home' && queuePreview.length > 0
 
   return (
     <div className="app-shell" style={themeStyle}>
@@ -91,7 +92,7 @@ function App() {
         <div className="ambient-orb ambient-orb--hot" />
       </div>
 
-      <div className="app-frame">
+      <div className={`app-frame ${showRail ? 'app-frame--with-rail' : 'app-frame--compact'}`}>
         <aside className="sidebar-panel glass-panel">
           <div className="brand-block">
             <div className="brand-mark">
@@ -154,7 +155,7 @@ function App() {
                 {currentTrack ? `Visuals tuned to ${currentTrack.title}` : 'Plum-toned premium music interface'}
               </h2>
               <p className="topbar-subtitle">
-                Clean layouts, liquid-glass depth, synchronized lyrics and Spotify import without heavy UI noise.
+                Split views keep search, queue and playback separate so the shell stays fast and readable.
               </p>
             </div>
 
@@ -187,35 +188,35 @@ function App() {
           </div>
         </main>
 
-        <aside className="rail-panel glass-panel">
-          <div className="rail-card">
-            <p className="eyebrow">Current mood</p>
-            <h3 className="section-title section-title--sm">
-              {currentTrack ? currentTrack.title : 'Waiting for a track'}
-            </h3>
-            <p className="meta-copy">
-              {currentTrack
-                ? `${currentTrack.artist} is steering the current color grade, blur and highlights.`
-                : 'Once a track starts playing, the shell shifts its gradients and glow around it.'}
-            </p>
-            <div className="palette-swatch-row">
-              <span style={{ background: moodPalette.base }} />
-              <span style={{ background: moodPalette.panel }} />
-              <span style={{ background: moodPalette.accent }} />
-              <span style={{ background: moodPalette.hot }} />
-              <span style={{ background: moodPalette.neutral }} />
-            </div>
-          </div>
-
-          <div className="rail-card">
-            <div className="section-header">
-              <div>
-                <p className="eyebrow">Queue preview</p>
-                <h3 className="section-title section-title--sm">Next in line</h3>
+        {showRail && (
+          <aside className="rail-panel glass-panel">
+            <div className="rail-card">
+              <p className="eyebrow">Current mood</p>
+              <h3 className="section-title section-title--sm">
+                {currentTrack ? currentTrack.title : 'Waiting for a track'}
+              </h3>
+              <p className="meta-copy">
+                {currentTrack
+                  ? `${currentTrack.artist} is steering the current color grade and lighting.`
+                  : 'Once a track starts playing, the shell shifts its gradients around it.'}
+              </p>
+              <div className="palette-swatch-row">
+                <span style={{ background: moodPalette.base }} />
+                <span style={{ background: moodPalette.panel }} />
+                <span style={{ background: moodPalette.accent }} />
+                <span style={{ background: moodPalette.hot }} />
+                <span style={{ background: moodPalette.neutral }} />
               </div>
             </div>
 
-            {queuePreview.length ? (
+            <div className="rail-card">
+              <div className="section-header">
+                <div>
+                  <p className="eyebrow">Queue preview</p>
+                  <h3 className="section-title section-title--sm">Next in line</h3>
+                </div>
+              </div>
+
               <div className="mini-track-list">
                 {queuePreview.map((track) => (
                   <div key={track.id} className="mini-track">
@@ -236,14 +237,9 @@ function App() {
                   </div>
                 ))}
               </div>
-            ) : (
-              <div className="lyrics-empty">
-                <Sparkles size={18} />
-                <p>Your right rail becomes a quick session overview after the first search.</p>
-              </div>
-            )}
-          </div>
-        </aside>
+            </div>
+          </aside>
+        )}
       </div>
 
       {currentTrack && <PlayerBar onExpand={() => setShowFullPlayer(true)} />}

@@ -15,7 +15,7 @@ export function SpotifyImportPanel() {
     if (!url.trim()) return
 
     setStatus('loading')
-    setMessage('Importing from Spotify and matching tracks on YouTube…')
+    setMessage('Importing from Spotify and matching tracks on YouTube...')
 
     try {
       const response = await fetch(`${API_BASE}/import/spotify`, {
@@ -72,7 +72,7 @@ export function SpotifyImportPanel() {
 
         <button type="submit" className="secondary-button" disabled={status === 'loading'}>
           <Import size={16} />
-          {status === 'loading' ? 'Importing…' : 'Import'}
+          {status === 'loading' ? 'Importing...' : 'Import'}
         </button>
       </form>
 

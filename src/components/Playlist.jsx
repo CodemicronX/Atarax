@@ -1,4 +1,5 @@
 import { Heart, Library, Shuffle, Waves } from 'lucide-react'
+import { SpotifyImportPanel } from './SpotifyImportPanel'
 import { TrackItem } from './TrackItem'
 import { usePlayerStore } from '../store'
 
@@ -62,30 +63,34 @@ export function Playlist() {
           )}
         </div>
 
-        <div className="section-card">
-          <div className="section-header">
-            <div>
-              <p className="eyebrow">Favorites</p>
-              <h2 className="section-title section-title--sm">Saved highlights</h2>
-            </div>
-            <span className="meta-pill">
-              <Heart size={14} />
-              {favorites.length}
-            </span>
-          </div>
+        <div className="page-stack">
+          <SpotifyImportPanel />
 
-          {favorites.length ? (
-            <div className="track-list">
-              {favorites.map((track, index) => (
-                <TrackItem key={track.id} track={track} index={index} />
-              ))}
+          <div className="section-card">
+            <div className="section-header">
+              <div>
+                <p className="eyebrow">Favorites</p>
+                <h2 className="section-title section-title--sm">Saved highlights</h2>
+              </div>
+              <span className="meta-pill">
+                <Heart size={14} />
+                {favorites.length}
+              </span>
             </div>
-          ) : (
-            <div className="lyrics-empty">
-              <Heart size={20} />
-              <p>Tap the heart on any track to keep it in your premium shelf.</p>
-            </div>
-          )}
+
+            {favorites.length ? (
+              <div className="track-list">
+                {favorites.map((track, index) => (
+                  <TrackItem key={track.id} track={track} index={index} />
+                ))}
+              </div>
+            ) : (
+              <div className="lyrics-empty">
+                <Heart size={20} />
+                <p>Tap the heart on any track to keep it in your premium shelf.</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>
