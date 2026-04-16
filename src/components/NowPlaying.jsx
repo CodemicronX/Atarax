@@ -14,20 +14,18 @@ function formatTime(seconds) {
 }
 
 export function NowPlaying({ onExpand }) {
-  const {
-    currentTrack,
-    tracks,
-    isPlaying,
-    isShuffleEnabled,
-    currentTime,
-    duration,
-    togglePlay,
-    toggleShuffle,
-    prevTrack,
-    nextTrack,
-    setCurrentTime,
-    setCurrentTrack,
-  } = usePlayerStore()
+  const currentTrack = usePlayerStore((state) => state.currentTrack)
+  const tracks = usePlayerStore((state) => state.tracks)
+  const isPlaying = usePlayerStore((state) => state.isPlaying)
+  const isShuffleEnabled = usePlayerStore((state) => state.isShuffleEnabled)
+  const currentTime = usePlayerStore((state) => state.currentTime)
+  const duration = usePlayerStore((state) => state.duration)
+  const togglePlay = usePlayerStore((state) => state.togglePlay)
+  const toggleShuffle = usePlayerStore((state) => state.toggleShuffle)
+  const prevTrack = usePlayerStore((state) => state.prevTrack)
+  const nextTrack = usePlayerStore((state) => state.nextTrack)
+  const requestSeek = usePlayerStore((state) => state.requestSeek)
+  const setCurrentTrack = usePlayerStore((state) => state.setCurrentTrack)
 
   if (!currentTrack) {
     return (
@@ -70,7 +68,8 @@ export function NowPlaying({ onExpand }) {
             onClick={(event) => {
               const rect = event.currentTarget.getBoundingClientRect()
               const percent = (event.clientX - rect.left) / rect.width
-              setCurrentTime(percent * duration)
+              const seekTime = Math.max(0, Math.min(duration || 0, percent * duration))
+              requestSeek(seekTime)
             }}
           >
             <div

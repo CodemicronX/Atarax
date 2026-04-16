@@ -44,6 +44,20 @@ function clampVolume(value) {
   return Math.max(0, Math.min(1, Number(value) || 0))
 }
 
+function arePalettesEqual(a, b) {
+  if (!a || !b) return false
+  return (
+    a.base === b.base &&
+    a.panel === b.panel &&
+    a.panelStrong === b.panelStrong &&
+    a.accent === b.accent &&
+    a.accentSoft === b.accentSoft &&
+    a.hot === b.hot &&
+    a.neutral === b.neutral &&
+    a.glow === b.glow
+  )
+}
+
 function findTrackIndex(tracks, trackId) {
   return tracks.findIndex((track) => track.id === trackId)
 }
@@ -56,6 +70,7 @@ export const usePlayerStore = create((set, get) => ({
   isShuffleEnabled: initialShuffle,
   currentTime: 0,
   duration: 0,
+  pendingSeekTime: null,
   volume: clampVolume(initialVolume),
   searchQuery: '',
   favorites: initialFavorites,
@@ -162,7 +177,28 @@ export const usePlayerStore = create((set, get) => ({
   setIsPlaying: (isPlaying) => set({ isPlaying }),
   togglePlay: () => set((state) => ({ isPlaying: !state.isPlaying })),
 
-  setCurrentTime: (currentTime) => set({ currentTime }),
+  setCurrentTime: (currentTime) => {
+    const safeTime = Number(currentTime)
+    const normalizedTime = Number.isFinite(safeTime) ? safeTime : 0
+    const previousTime = get().currentTime
+    if (Math.abs(previousTime - normalizedTime) < 0.25) {
+      return
+    }
+    return set({ currentTime: normalizedTime })
+  },
+  requestSeek: (currentTime) => {
+    const safeTime = Number(currentTime)
+    const normalizedTime = Number.isFinite(safeTime) ? safeTime : 0
+    const previousSeek = get().pendingSeekTime
+    if (previousSeek !== null && Math.abs(previousSeek - normalizedTime) < 0.25) {
+      return
+    }
+    return set({ currentTime: normalizedTime, pendingSeekTime: normalizedTime })
+  },
+  clearPendingSeek: () => {
+    if (get().pendingSeekTime === null) return
+    set({ pendingSeekTime: null })
+  },
   setDuration: (duration) => set({ duration: Number(duration) || 0 }),
 
   nextTrack: () => {
@@ -286,7 +322,12 @@ export const usePlayerStore = create((set, get) => ({
 
   setLyricsStatus: (lyricsStatus) => set({ lyricsStatus }),
 
-  setMoodPalette: (moodPalette) => set({ moodPalette: moodPalette || DEFAULT_PALETTE }),
+  setMoodPalette: (moodPalette) => {
+    const nextPalette = moodPalette || DEFAULT_PALETTE
+    const previousPalette = get().moodPalette
+    if (arePalettesEqual(previousPalette, nextPalette)) return
+    set({ moodPalette: nextPalette })
+  },
 
   isFavorite: (trackId) => Boolean(get().favorites[trackId]),
 }))

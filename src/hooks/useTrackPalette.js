@@ -1,4 +1,4 @@
-import { startTransition, useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { usePlayerStore } from '../store'
 import { createFallbackPalette } from '../utils/palette'
 
@@ -8,16 +8,12 @@ export function useTrackPalette(track) {
   const trackTitle = track?.title
   const trackArtist = track?.artist
 
+  const fallback = useMemo(
+    () => createFallbackPalette(trackId || trackTitle || trackArtist || 'lane-player'),
+    [trackId, trackTitle, trackArtist],
+  )
+
   useEffect(() => {
-    const fallback = createFallbackPalette(trackId || trackTitle || trackArtist || 'lane-player')
-
-    if (!trackId && !trackTitle) {
-      setMoodPalette(fallback)
-      return undefined
-    }
-
-    startTransition(() => setMoodPalette(fallback))
-
-    return undefined
-  }, [setMoodPalette, trackArtist, trackId, trackTitle])
+    setMoodPalette(fallback)
+  }, [setMoodPalette, fallback])
 }

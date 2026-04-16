@@ -4,6 +4,8 @@ import cors from 'cors'
 import axios from 'axios'
 import { pipeline } from 'node:stream/promises'
 import { Innertube } from 'youtubei.js'
+import { type } from 'node:os'
+import { format } from 'node:path'
 
 const app = express()
 const PORT = 3001
@@ -63,7 +65,7 @@ function splitTrackTitle(rawTitle = '', fallbackArtist = '') {
     artist: fallbackArtist.trim() || 'Unknown artist',
     title: cleanedTitle || rawTitle || 'Unknown title',
   }
-}
+}  
 
 function normalizeYoutubeTrack(item) {
   const author = item.author?.name || ''
@@ -94,10 +96,14 @@ function pickAudioFormat(info) {
 async function initYoutube() {
   youtube = await Innertube.create({
     generate_session_locally: true,
-  })
-  console.log('YouTube client ready')
+    fetch: (input, init) => {
+      const headers = new Headers(init?.headers);
+      headers.set('User-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+      return fetch(input, { ...init, headers });
+    }
+  });
+  console.log('Youtube client ready')
 }
-
 async function searchYoutubeTracks(query, limit = 12) {
   const searchResult = await youtube.search(query)
   const videos = searchResult.videos || []
@@ -109,25 +115,36 @@ async function searchYoutubeTracks(query, limit = 12) {
 }
 
 async function getStreamForTrack(videoId) {
-  const info = await youtube.getBasicInfo(videoId)
-  const audioFormat = pickAudioFormat(info)
-  const streamUrl =
-    audioFormat?.url ||
-    info.streaming_data?.server_abr_streaming_url ||
-    info.streaming_data?.hls_manifest_url ||
-    info.streaming_data?.dash_manifest_url
+  try {
+    // Используем getInfo для получения полных данных о стримах
+    const info = await youtube.getInfo(videoId);
+    
+    // Выбираем лучший аудио-формат
+    const format = info.chooseFormat({ type: 'audio', quality: 'best' });
 
-  if (!streamUrl) {
-    throw new Error('No stream URL available')
-  }
+    if (!format) {
+      throw new Error('Audio format not found');
+    }
 
-  return {
-    url: streamUrl.toString(),
-    bitrate: audioFormat?.bitrate || info.streaming_data?.formats?.[0]?.bitrate || 0,
-    mimeType: audioFormat?.mime_type || info.streaming_data?.formats?.[0]?.mime_type || 'audio/mp4',
+    // Проверяем, нужно ли расшифровывать URL (signatureCipher) или он уже есть
+    const streamUrl = format.signature_cipher 
+      ? format.decipher(youtube.session.player) 
+      : format.url;
+
+    if (!streamUrl) {
+      throw new Error('Failed to extract stream URL');
+    }
+
+    return {
+      url: streamUrl,
+      bitrate: format.bitrate || 0,
+      mimeType: format.mime_type || 'audio/mp4',
+    };
+  } catch (err) {
+    console.error('Ошибка получения потока:', err.message);
+    throw err;
   }
 }
-
 function parseLrc(syncedLyrics = '') {
   if (!syncedLyrics) return []
 
@@ -524,56 +541,45 @@ app.get('/api/stream/:videoId', async (req, res) => {
 
 app.get('/api/audio/:videoId', async (req, res) => {
   try {
-    const stream = await getStreamForTrack(req.params.videoId)
+    // ВАЖНО: Добавлен await, чтобы получить объект, а не Promise
+    const stream = await getStreamForTrack(req.params.videoId); 
+
     const upstream = await axios.get(stream.url, {
       responseType: 'stream',
-      headers: req.headers.range
-        ? {
-            Range: req.headers.range,
-          }
-        : undefined,
+      headers: req.headers.range ? { Range: req.headers.range } : undefined,
       validateStatus: (status) => status >= 200 && status < 500,
       timeout: 15000,
-    })
+    });
 
     if (upstream.status >= 400) {
-      return res.status(upstream.status).json({ error: 'Audio upstream rejected the request' })
+      return res.status(upstream.status).json({ error: 'YouTube rejected stream request' });
     }
 
-    res.status(upstream.status)
-
+    // Пробрасываем заголовки для корректной работы плеера и перемотки
+    res.status(upstream.status);
     const headersToForward = [
       'content-type',
       'content-length',
       'content-range',
       'accept-ranges',
-      'cache-control',
-      'last-modified',
-      'etag',
-    ]
+    ];
 
-    for (const header of headersToForward) {
-      const value = upstream.headers[header]
-      if (value) {
-        res.setHeader(header, value)
-      }
+    headersToForward.forEach(h => {
+      if (upstream.headers[h]) res.setHeader(h, upstream.headers[h]);
+    });
+
+    if (!res.getHeader('content-type')) {
+      res.setHeader('content-type', stream.mimeType);
     }
 
-    if (!upstream.headers['content-type']) {
-      res.setHeader('content-type', stream.mimeType || 'audio/mp4')
-    }
-
-    await pipeline(upstream.data, res)
+    await pipeline(upstream.data, res);
   } catch (error) {
-    console.error('Audio proxy error:', error)
+    console.error('Audio proxy error:', error.message);
     if (!res.headersSent) {
-      res.status(500).json({ error: error.message || 'Failed to proxy audio stream' })
-    } else {
-      res.destroy(error)
+      res.status(500).json({ error: 'Streaming failed' });
     }
   }
-})
-
+});
 app.get('/api/lyrics', async (req, res) => {
   try {
     const payload = await fetchLyrics({

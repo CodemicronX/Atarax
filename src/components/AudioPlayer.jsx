@@ -1,137 +1,66 @@
-import { Suspense, lazy, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { usePlayerStore } from '../store'
-import { parseLyricsLines } from '../utils/lyrics'
 
 const API_BASE = 'http://localhost:3001/api'
-const ReactPlayer = lazy(() => import('react-player'))
 
 export function AudioPlayer() {
-  const playerRef = useRef(null)
-  const lyricsCacheRef = useRef(new Map())
+  const audioRef = useRef(null)
 
-  const {
-    currentTrack,
-    isPlaying,
-    volume,
-    currentTime,
-    setIsPlaying,
-    setCurrentTime,
-    setDuration,
-    nextTrack,
-    setLyrics,
-    setLyricsStatus,
-  } = usePlayerStore()
+  const currentTrack = usePlayerStore((state) => state.currentTrack)
+  const isPlaying = usePlayerStore((state) => state.isPlaying)
+  const volume = usePlayerStore((state) => state.volume)
+  const pendingSeekTime = usePlayerStore((state) => state.pendingSeekTime)
+  const setIsPlaying = usePlayerStore((state) => state.setIsPlaying)
+  const setCurrentTime = usePlayerStore((state) => state.setCurrentTime)
+  const clearPendingSeek = usePlayerStore((state) => state.clearPendingSeek)
+  const setDuration = usePlayerStore((state) => state.setDuration)
+  const nextTrack = usePlayerStore((state) => state.nextTrack)
 
+  // Меняем трек
   useEffect(() => {
-    if (!currentTrack) {
-      setDuration(0)
-      return undefined
-    }
+    if (!currentTrack || !audioRef.current) return
+    audioRef.current.src = `${API_BASE}/audio/${currentTrack.id}`
+    audioRef.current.load()
+    if (isPlaying) audioRef.current.play().catch(console.error)
+  }, [currentTrack])
 
-    let cancelled = false
-
-    const loadLyrics = async () => {
-      try {
-        const cachedLyrics = lyricsCacheRef.current.get(currentTrack.id)
-        let lyricsPayload = cachedLyrics
-
-        if (!lyricsPayload) {
-          const response = await fetch(
-            `${API_BASE}/lyrics?videoId=${encodeURIComponent(currentTrack.id)}&title=${encodeURIComponent(currentTrack.title)}&artist=${encodeURIComponent(currentTrack.artist)}&duration=${encodeURIComponent(currentTrack.duration || 0)}`,
-          )
-          const payload = await response.json()
-
-          if (!response.ok) {
-            throw new Error(payload.error || 'Lyrics request failed')
-          }
-
-          lyricsPayload = payload
-          lyricsCacheRef.current.set(currentTrack.id, lyricsPayload)
-        }
-
-        if (cancelled || !lyricsPayload) return
-
-        setLyrics({
-          lines: lyricsPayload.lines?.length ? lyricsPayload.lines : parseLyricsLines(lyricsPayload.syncedLyrics || ''),
-          plainLyrics: lyricsPayload.plainLyrics || '',
-          source: lyricsPayload.source || null,
-          status:
-            lyricsPayload.lines?.length || lyricsPayload.syncedLyrics || lyricsPayload.plainLyrics
-              ? 'ready'
-              : 'empty',
-        })
-      } catch (error) {
-        console.error('Error loading lyrics:', error)
-        if (!cancelled) {
-          setLyrics({
-            lines: [],
-            plainLyrics: '',
-            source: null,
-            status: 'error',
-          })
-        }
-      }
-    }
-
-    setLyricsStatus('loading')
-    loadLyrics()
-
-    return () => {
-      cancelled = true
-    }
-  }, [currentTrack, setDuration, setLyrics, setLyricsStatus])
-
+  // Play / Pause
   useEffect(() => {
-    const player = playerRef.current
-    if (!player || !currentTrack) return
-
-    const actualTime = player.getCurrentTime?.() || 0
-    if (Math.abs(actualTime - currentTime) > 1) {
-      player.seekTo(currentTime, 'seconds')
+    if (!audioRef.current) return
+    if (isPlaying) {
+      audioRef.current.play().catch(console.error)
+    } else {
+      audioRef.current.pause()
     }
-  }, [currentTime, currentTrack])
+  }, [isPlaying])
+
+  // Громкость
+  useEffect(() => {
+    if (!audioRef.current) return
+    audioRef.current.volume = volume
+  }, [volume])
+
+  // Seek
+  useEffect(() => {
+    if (!audioRef.current || pendingSeekTime === null) return
+    audioRef.current.currentTime = pendingSeekTime
+    clearPendingSeek()
+  }, [pendingSeekTime])
 
   if (!currentTrack) return null
 
   return (
-    <div className="media-engine" aria-hidden="true">
-      <Suspense fallback={null}>
-        <ReactPlayer
-          ref={playerRef}
-          url={`https://www.youtube.com/watch?v=${currentTrack.id}`}
-          width={1}
-          height={1}
-          playing={isPlaying}
-          volume={volume}
-          progressInterval={200}
-          playsinline
-          config={{
-            youtube: {
-              playerVars: {
-                autoplay: 1,
-                controls: 0,
-                fs: 0,
-                modestbranding: 1,
-                playsinline: 1,
-                rel: 0,
-              },
-            },
-          }}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-          onProgress={({ playedSeconds }) => {
-            setCurrentTime(playedSeconds)
-          }}
-          onDuration={(duration) => {
-            setDuration(duration)
-          }}
-          onEnded={nextTrack}
-          onError={(error) => {
-            console.error('Playback error:', error)
-            setIsPlaying(false)
-          }}
-        />
-      </Suspense>
-    </div>
+    <audio
+      ref={audioRef}
+      onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)}
+      onDurationChange={() => setDuration(audioRef.current?.duration || 0)}
+      onEnded={nextTrack}
+      onPlay={() => setIsPlaying(true)}
+      onPause={() => setIsPlaying(false)}
+      onError={(e) => {
+        console.error('Audio error:', e)
+        setIsPlaying(false)
+      }}
+    />
   )
 }

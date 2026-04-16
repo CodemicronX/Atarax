@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Heart, Library, Shuffle, Waves } from 'lucide-react'
 import { SpotifyImportPanel } from './SpotifyImportPanel'
 import { TrackItem } from './TrackItem'
@@ -5,7 +6,8 @@ import { usePlayerStore } from '../store'
 
 export function Playlist() {
   const tracks = usePlayerStore((state) => state.tracks)
-  const favorites = usePlayerStore((state) => Object.values(state.favorites))
+  const favoritesMap = usePlayerStore((state) => state.favorites)
+  const favorites = useMemo(() => Object.values(favoritesMap), [favoritesMap])
   const isShuffleEnabled = usePlayerStore((state) => state.isShuffleEnabled)
   const toggleShuffle = usePlayerStore((state) => state.toggleShuffle)
 

@@ -13,7 +13,12 @@ function formatTime(duration) {
 }
 
 export function TrackItem({ track, index = 0 }) {
-  const { currentTrack, isPlaying, setCurrentTrack, togglePlay, setHoverTrackId, hoverTrackId } = usePlayerStore()
+  const currentTrack = usePlayerStore((state) => state.currentTrack)
+  const isPlaying = usePlayerStore((state) => state.isPlaying)
+  const setCurrentTrack = usePlayerStore((state) => state.setCurrentTrack)
+  const togglePlay = usePlayerStore((state) => state.togglePlay)
+  const setHoverTrackId = usePlayerStore((state) => state.setHoverTrackId)
+  const hoverTrackId = usePlayerStore((state) => state.hoverTrackId)
   const isActive = currentTrack?.id === track.id
   const isHovered = hoverTrackId === track.id
 
